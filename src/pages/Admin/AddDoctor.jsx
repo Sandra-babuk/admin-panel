@@ -1,64 +1,55 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { assets } from '../../assets/assets';
 import { addDoctorAPI } from '../../services/allApi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { AdminContext } from '../../context/AdminContext';
 
 const AddDoctor = () => {
-  const [docImg, setDocImg] = useState(null);
+  const [image, setImage] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [experience, setExperience] = useState('1 Year');
+  const [experience, setExperience] = useState('');
   const [fees, setFees] = useState('');
-  const [about, setAbout] = useState('');
-  const [speciality, setSpeciality] = useState('General Physician');
+  const [speciality, setSpeciality] = useState('');
   const [degree, setDegree] = useState('');
-  const [address1, setAddress1] = useState('');
-  const [address2, setAddress2] = useState('');
-
-  const { admToken } = useContext(AdminContext);
+  const [address, setAddress] = useState('');
+  const [about, setAbout] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-
+  
+    if (!name || !email || !password || !experience || !fees || !speciality || !degree || !address || !about || !image) {
+      toast.error('Please fill all required fields.');
+      return;
+    }
+  
+    const reqBody = new FormData();
+    reqBody.append('name', name);
+    reqBody.append('email', email);
+    reqBody.append('password', password);
+    reqBody.append('experience', experience);
+    reqBody.append('fees', fees);
+    reqBody.append('speciality', speciality);
+    reqBody.append('degree', degree);
+    reqBody.append('address', address);
+    reqBody.append('about', about);
+    reqBody.append('image', image); // Ensure the file is appended here
+  
     try {
-      if (!docImg) {
-        return toast.error('image not upload')
-      }
-
-      const formData = new FormData();
-      formData.append('image', docImg);
-      formData.append('name', name);
-      formData.append('email', email);
-      formData.append('password', password);
-      formData.append('experience', experience);
-      formData.append('fees', fees);
-      formData.append('about', about);
-      formData.append('speciality', speciality);
-      formData.append('degree', degree);
-      formData.append('address', JSON.stringify({ address1, address2 }));
-
-      // console
-      formData.forEach((value, key) => {
-        console.log(`${key} : ${value}`);
-
-      })
-
-      const { data } = await addDoctorAPI(formData, { headers: { admToken } })
-
-      if (data.success) {
-        toast.success(data.message)
+      const result = await addDoctorAPI(reqBody);
+  
+      if (result?.status === 200) {
+        toast.success('Doctor added successfully!');
       } else {
-        toast.error(data.message)
+        toast.error(result?.message || 'Failed to add doctor.');
       }
-
-    } catch (error) {
-
+    } catch (err) {
+      toast.error('Something went wrong. Please try again later.');
+      console.error('Error during API call:', err);
     }
   };
+  
 
   return (
     <>
@@ -66,25 +57,21 @@ const AddDoctor = () => {
       <form onSubmit={handleSubmit} className="m-5 w-full">
         <p className="mb-3 text-lg font-medium">Add Doctor</p>
         <div className="bg-white px-8 py-8 border rounded w-full max-w-4xl max-h-[80vh] overflow-y-scroll">
-          <div className="flex items-center gap-4 mb-8 text-gray-500">
-            <label htmlFor="doc-img">
-              <img
-                className="w-16 bg-gray-100 rounded-full cursor-pointer"
-                src={docImg ? URL.createObjectURL(docImg) : assets.upload_area}
-                alt="Upload area"
-              />
-            </label>
-            <input
-              onChange={(e) => setDocImg(e.target.files[0])}
-              type="file"
-              id="doc-img"
-              hidden
-            />
-            <p>Upload doctor<br />picture</p>
-          </div>
+
 
           <div className="flex flex-col lg:flex-row items-start gap-10 text-gray-600">
             <div className="w-full lg:flex-1 flex flex-col gap-4">
+            <div className="flex-1 flex flex-col gap-1">
+                <p>Image Url</p>
+                <input
+                  onChange={(e) => setImage(e.target.value)}
+                  value={image}
+                  className="border rounded px-3 py-2"
+                  type="text"
+                  placeholder="Name"
+                  required
+                />
+              </div>
               <div className="flex-1 flex flex-col gap-1">
                 <p>Doctor Name</p>
                 <input
@@ -124,19 +111,13 @@ const AddDoctor = () => {
                   onChange={(e) => setExperience(e.target.value)}
                   value={experience}
                   className="border rounded px-3 py-2"
-                  name="experience"
-                  id="experience"
+                  required
                 >
-                  <option value="1 Year">1 Year</option>
-                  <option value="2 Year">2 Year</option>
-                  <option value="3 Year">3 Year</option>
-                  <option value="4 Year">4 Year</option>
-                  <option value="5 Year">5 Year</option>
-                  <option value="6 Year">6 Year</option>
-                  <option value="7 Year">7 Year</option>
-                  <option value="8 Year">8 Year</option>
-                  <option value="9 Year">9 Year</option>
-                  <option value="10 Year">10 Year</option>
+                  {[...Array(10).keys()].map((year) => (
+                    <option key={year + 1} value={`${year + 1} Year`}>
+                      {year + 1} Year
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="flex-1 flex flex-col gap-1">
@@ -158,9 +139,9 @@ const AddDoctor = () => {
                   onChange={(e) => setSpeciality(e.target.value)}
                   value={speciality}
                   className="border rounded px-3 py-2"
-                  name="speciality"
-                  id="speciality"
+                  required
                 >
+                  <option value="">Select Speciality</option>
                   <option value="General Physician">General Physician</option>
                   <option value="Gynecologist">Gynecologist</option>
                   <option value="Dermatologist">Dermatologist</option>
@@ -184,19 +165,11 @@ const AddDoctor = () => {
               <div className="flex-1 flex flex-col gap-1">
                 <p>Address</p>
                 <input
-                  onChange={(e) => setAddress1(e.target.value)}
-                  value={address1}
+                  onChange={(e) => setAddress(e.target.value)}  // Update address here
+                  value={address}
                   className="border rounded px-3 py-2"
                   type="text"
-                  placeholder="Address 1"
-                  required
-                />
-                <input
-                  onChange={(e) => setAddress2(e.target.value)}
-                  value={address2}
-                  className="border rounded px-3 py-2"
-                  type="text"
-                  placeholder="Address 2"
+                  placeholder="Address"
                   required
                 />
               </div>
@@ -214,10 +187,7 @@ const AddDoctor = () => {
             ></textarea>
           </div>
 
-          <button
-            type="submit"
-            className="bg-primary px-10 py-3 mt-4 text-white rounded-full"
-          >
+          <button type="submit" className="bg-primary px-10 py-3 mt-4 text-white rounded-full">
             Add Doctor
           </button>
         </div>

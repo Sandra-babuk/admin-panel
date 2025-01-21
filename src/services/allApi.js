@@ -5,7 +5,16 @@ import SERVERURL from "./serverUrl";
 export const adminLoginAPI = async (reqBody) => {
     return await commonAPI("POST", `${SERVERURL}/admin/admin-login`, reqBody);
 };
-// add doctor by admin
-export const addDoctorAPI = async (formData,reqHeader)=>{
-    return await commonAPI("POST",`${SERVERURL}/admin/add-doctor`,formData,reqHeader)
-}
+// Add doctor by admin
+export const addDoctorAPI = async (reqBody) => {
+    try {
+        const response = await commonAPI("POST", `${SERVERURL}/admin/add-doctor`, reqBody);
+        return response;
+    } catch (error) {
+        console.error("Error adding doctor:", error);
+        throw error;
+    }
+};
+
+
+
