@@ -38,6 +38,8 @@ const AddDoctor = () => {
   
     try {
       const result = await addDoctorAPI(reqBody);
+      console.log(result);
+      
   
       if (result?.status === 200) {
         toast.success('Doctor added successfully!');

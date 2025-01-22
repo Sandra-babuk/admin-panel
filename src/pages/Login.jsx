@@ -4,6 +4,7 @@ import { AdminContext } from '../context/AdminContext';
 import { adminLoginAPI } from '../services/allApi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {useNavigate} from 'react-router-dom'
 
 const Login = () => {
   const [state, setState] = useState('Admin');
@@ -11,6 +12,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
 
   const { setAdmToken, backendUrl } = useContext(AdminContext);
+  const navigate = useNavigate()
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -57,7 +59,7 @@ const Login = () => {
               required
             />
           </div>
-          <button className='bg-primary text-white w-full py-2 rounded-md text-base'>Login</button>
+          <button  className='bg-primary text-white w-full py-2 rounded-md text-base'>Login</button>
           {state === 'Admin' ? (
             <p>Doctor Login? <span className='text-primary underline cursor-pointer' onClick={() => setState('Doctor')}>Click here</span></p>
           ) : (

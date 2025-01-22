@@ -16,5 +16,11 @@ export const addDoctorAPI = async (reqBody) => {
     }
 };
 
+// get all doctor
+export const getDoctorAPI = async()=>{
+    return await commonAPI ("GET",`${SERVERURL}/admin/get-doctor`,"")
+}
+
+
 
 
