@@ -21,6 +21,11 @@ export const getDoctorAPI = async()=>{
     return await commonAPI ("GET",`${SERVERURL}/admin/get-doctor`,"")
 }
 
+// update doctor availability
+export const updateAvailabilityAPI = async (doctorId) => {
+    return await commonAPI("POST", `${SERVERURL}/admin/update-availability`, { doctorId });
+  };
+
 
 
 
